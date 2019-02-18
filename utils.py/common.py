@@ -8,6 +8,10 @@ import requests
 from series.config import DISORDER
 
 
+def save_img():
+    pass
+
+
 def save2txt(read_path, write_path, encoding):
     '''
     :param: read_path: csv路径名 
