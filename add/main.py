@@ -21,7 +21,6 @@ class DedeAddArticle:
         self.subcolumn_selector = subcolumn_selector
         self.maincolumn_id = maincolumn_id
         self.subcolumn = subcolumn
-        self.error_select = 0
         # if DISPLAY_BROSER:
         self.browser = webdriver.Chrome()
         self.browser.maximize_window()
@@ -52,7 +51,6 @@ class DedeAddArticle:
     
     def error(self):
         self.browser.switch_to_default_content()
-        self.error_select = 1
     
     def column(self):
         '''
@@ -85,7 +83,7 @@ class DedeAddArticle:
             subcolumn_botton = self.browser.find_element_by_css_selector(subcolumn_selector)
             subcolumn_botton.click()
 
-    def add_article(self, title, body, tag='', keyword=''):
+    def add_article(self, title, keyword, summary, L, tag=''):
         '''
         添加文章
         '''
@@ -93,17 +91,25 @@ class DedeAddArticle:
         tag_selector = '#tags'
         keyword_selector = '#keywords'
         save_selector = 'body > form > table:nth-child(8) > tbody > tr > td:nth-child(2) > input'
+        sourcecode_selector = '#cke_8' 
+        body_selector = '#cke_contents_body > textarea'
         title_input = self.browser.find_element_by_css_selector(title_selector)
         title_input.send_keys(title)
         tag_input = self.browser.find_element_by_css_selector(tag_selector)
         tag_input.send_keys(tag)
         keyword_input = self.browser.find_element_by_css_selector(keyword_selector)
         keyword_input.send_keys(keyword)
-        self.browser.switch_to_frame(self.browser.find_element_by_xpath('//iframe[contains(@allowtransparency,"true")]'))
-        body_input = self.browser.find_element_by_class_name('cke_show_borders')
+        # 此处还须点击源码
+        sourcecode_input = self.browser.find_element_by_css_selector(sourcecode_selector)
+        sourcecode_input.click()
+        # self.browser.switch_to_frame(self.browser.find_element_by_xpath('//iframe[contains(@allowtransparency,"true")]'))
+        # body_input = self.browser.find_element_by_class_name('cke_show_borders')
+        body_input = self.browser.find_element_by_css_selector(body_selector)
         body_input.click()
-        body_input.send_keys(body)
-        self.browser.switch_to.parent_frame()
+        for line in L:
+            body_input.send_keys(line)
+            body_input.send_keys(Keys.ENTER)
+        # self.browser.switch_to.parent_frame() # 不再需要切换到父ifame
         save_botton = self.browser.find_element_by_css_selector(save_selector)
         save_botton.click()
 
@@ -121,8 +127,15 @@ def read_file(path1):
             title = i[:-4]
             path2 = path1 + '\\' + i
     with open(path2, 'r') as f:
-        body = f.read()
-    return title, body
+        keyword = f.readline()[:-1]
+        summary = f.readline()[:-1]
+        L = ['<style>body{font-size: 14px;}</style>']
+        for i in f.readlines():
+            if len(i) < 4:
+                continue
+            L.append(f'<span>　　{i[:-1].strip()}</span><br/>')
+            L.append(f'<span>　　</span><br/>')
+    return title, keyword, summary,L
 
 
 def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path):
@@ -137,8 +150,8 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
         try:
             path1 = path + i
             print(f'读取路径{path1}')
-            title, body = read_file(path1)
-            dede.add_article(title, body)
+            title, keyword, summary,L = read_file(path1)
+            dede.add_article(title, keyword, summary, L)
             print(f'添加文章:{title}成功,准备添加下一篇')
             dede.continue_add()
         except Exception as e:
