@@ -6,7 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-from config import DISPLAY_BROSER
+from config import FONT_SIZE, DISPLAY_BROSER
 
 
 warnings.filterwarnings("ignore")
@@ -21,13 +21,13 @@ class DedeAddArticle:
         self.subcolumn_selector = subcolumn_selector
         self.maincolumn_id = maincolumn_id
         self.subcolumn = subcolumn
-        # if DISPLAY_BROSER:
-        self.browser = webdriver.Chrome()
-        self.browser.maximize_window()
-        # else:
-        #     chrome_options=Options()
-        #     chrome_options.add_argument('--headless')
-        #     self.browser = webdriver.Chrome(chrome_options=chrome_options)
+        if DISPLAY_BROSER:
+            self.browser = webdriver.Chrome()
+            self.browser.maximize_window()
+        else:
+            chrome_options=Options()
+            chrome_options.add_argument('--headless')
+            self.browser = webdriver.Chrome(chrome_options=chrome_options)
         self.browser.implicitly_wait(10)
     
     def __del__(self):
@@ -83,7 +83,7 @@ class DedeAddArticle:
             subcolumn_botton = self.browser.find_element_by_css_selector(subcolumn_selector)
             subcolumn_botton.click()
 
-    def add_article(self, title, keyword, summary, L, tag=''):
+    def add_article(self, title, keyword, summary, L, img_L, tag=''):
         '''
         添加文章
         '''
@@ -117,25 +117,50 @@ class DedeAddArticle:
         continue_selector = 'body > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > div > a:nth-child(1) > u'
         continue_botton = self.browser.find_element_by_css_selector(continue_selector)
         continue_botton.click()
+    
+    def add_img(self):
+        '''
+        1.点源码
+        sourcecode_selector = '#cke_8'
+        sourcecode_input = self.browser.find_element_by_css_selector(sourcecode_selector)
+        sourcecode_input.click()
+        2.点击图像 main ifame #cke_27
+        3.上传 main ifame #cke_Upload_143 send_keys
+        切换到子ifame
+        4.选择文件 ifame#cke_138_fileInput body > form > input[type="file"]
+        5.上传到服务器上 ifame#cke_138_fileInput #cke_140_labelifame
+        上传完后切回父ifame
+        6.自动跳到图像界面选择确定 ifame#main #cke_172_label
+        7.点源码
+        8.点输入框
+        body_selector = '#cke_contents_body > textarea'
+        body_input = self.browser.find_element_by_css_selector(body_selector)
+        body_input.click()
+        错误：关闭 ifame#main #cke_dialog_close_button_84
+        '''
+        pass
         
 
 def read_file(path1): 
     path1 = path1 + '\\'
     list2 = os.listdir(path1)
+    img_L = []
     for i in list2:
+        if i[-3:] in ['jpg', 'png', 'gif']:
+            img_L.append(path1+i)
         if i[-3:] == 'txt':
             title = i[:-4]
             path2 = path1 + '\\' + i
     with open(path2, 'r') as f:
         keyword = f.readline()[:-1]
         summary = f.readline()[:-1]
-        L = ['<style>body{font-size: 14px;}</style>']
+        L = [f'<style>body{{font-size: {FONT_SIZE}px;}}</style>']
         for i in f.readlines():
             if len(i) < 4:
                 continue
             L.append(f'<span>　　{i[:-1].strip()}</span><br/>')
             L.append(f'<span>　　</span><br/>')
-    return title, keyword, summary,L
+    return title, keyword, summary, L, img_L
 
 
 def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path):
@@ -150,8 +175,8 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
         try:
             path1 = path + i
             print(f'读取路径{path1}')
-            title, keyword, summary,L = read_file(path1)
-            dede.add_article(title, keyword, summary, L)
+            title, keyword, summary, L, img_L = read_file(path1)
+            dede.add_article(title, keyword, summary, L, img_L)
             print(f'添加文章:{title}成功,准备添加下一篇')
             dede.continue_add()
         except Exception as e:

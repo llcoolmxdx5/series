@@ -20,6 +20,10 @@
 	文件夹路径 存放文章的文件夹 例如D:\file1
 有多个网站则填写多项
 
+在config.py中可选择显示不显示浏览器界面
+可以控制文章的字体大小 默认为14px
+dede后台限制仅支持jpg png gif格式的图片 并且不能超过2mb
+
 在vscode中打开config.py文件
 参见config.py的注释填写各项
 然后打开run.py文件 在vscode中右键选择在终端中运行python文件即可
