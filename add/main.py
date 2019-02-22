@@ -6,7 +6,12 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-from config import FONT_SIZE, DISPLAY_BROSER
+from config import AUTO_KEYWORD, CONFIRM_KEYSUMM, DISPLAY_BROSER, FONT_SIZE, AUTO_SUMMARY
+
+try:
+    import jieba.analyse
+except Exception as e:
+    print(e)
 
 
 warnings.filterwarnings("ignore")
@@ -40,9 +45,6 @@ class DedeAddArticle:
         self.browser.find_element_by_css_selector(selector).send_keys(sendkeys)
 
     def login(self):
-        '''
-        此实例方法用于处理登录账户
-        '''
         uname_selector = '#login-box > div.login-main > form > dl > dd:nth-child(2) > input[type="text"]'
         upwd_selector = '#login-box > div.login-main > form > dl > dd:nth-child(4) > input'
         submit_selctor = '#login-box > div.login-main > form > dl > dd:nth-child(6) > button'
@@ -56,9 +58,6 @@ class DedeAddArticle:
         self.browser.switch_to_default_content()
     
     def column(self):
-        '''
-        选择栏目
-        '''
         time.sleep(10)
         maincolumn_selector = f'body > table > tbody > tr:nth-child(4) > td > table:nth-child({self.maincolumn}) > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr > td:nth-child(1) > a:nth-child(2)'
         webcolumn_selector = '#items1_1 > ul > li:nth-child(1) > div > div.fllct > a'
@@ -83,9 +82,6 @@ class DedeAddArticle:
             self.__click(subcolumn_selector)
 
     def add_article(self, title, keyword, summary, L, img_L, tag=''):
-        '''
-        添加文章
-        '''
         title_selector = '#title'
         tag_selector = '#tags'
         keyword_selector = '#keywords'
@@ -97,7 +93,6 @@ class DedeAddArticle:
         self.__sendkeys(tag_selector, tag)
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
-        # 此处还须点击源码
         self.__click(sourcecode_selector)
         for line in L:
             self.__sendkeys(body_selector, line)
@@ -142,8 +137,20 @@ class DedeAddArticle:
             self.__click(sourcecode_selector) # 7
         except:
             print(f'添加图片:{imgpath} 失败')
+            try:
+                alert = self.browser.switch_to_alert()
+                alert.accept()
+            except:
+                pass
             self.browser.switch_to.default_content()
             self.browser.switch_to_frame('main')
+
+
+def autokeyword(path):
+    with open(path) as f:
+        content = f.read()
+    keys = jieba.analyse.extract_tags(content, topK=3, allowPOS=('ns', 'n', 'vn', 'v', 'i', 'l', 'nr', 'nt', 'nz'))
+    return ','.join(keys)
 
 
 def read_file(path1): 
@@ -157,14 +164,29 @@ def read_file(path1):
             title = i[:-4]
             path2 = path1 + '\\' + i
     with open(path2, 'r') as f:
-        keyword = f.readline()[:-1]
-        summary = f.readline()[:-1]
-        L = [f'<style>body{{font-size: {FONT_SIZE}px;}}</style>']
-        for i in f.readlines():
-            if len(i) < 4:
+        if CONFIRM_KEYSUMM:
+            keyword = f.readline()[:-1]
+            summary = f.readline()[:-1]
+        else:
+            keyword = ''
+            summary = ''
+        L = []
+        content_L = []
+        for j in f.readlines():
+            if len(j) < 4:
                 continue
-            L.append(f'<span>　　{i[:-1].strip()}</span><br/>')
-            L.append(f'<span>　　</span><br/>')
+            content_L.append(j)
+        if AUTO_SUMMARY and len(summary) < 2:
+            summary = content_L[0]
+        for i in content_L:
+            L.append(f'<span style="font-size: {FONT_SIZE}px;">　　{i[:-1].strip()}</span><br style="font-size: {FONT_SIZE}px;">')
+            L.append(f'<span style="font-size: {FONT_SIZE}px;">　　</span><br style="font-size: {FONT_SIZE}px;">')
+    if AUTO_KEYWORD:
+        keys = autokeyword(path2)
+        if CONFIRM_KEYSUMM:
+            keyword = keyword + keys
+        else:
+            keyword = keyword + ',' + keys
     return title, keyword, summary, L, img_L
 
 
@@ -189,4 +211,3 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
             dede.error()
             dede.column()
     print('添加文章结束')
-
