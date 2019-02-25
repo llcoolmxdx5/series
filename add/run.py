@@ -17,9 +17,9 @@ if __name__ == "__main__":
             maincolumn_id = row['主栏目ID']
             subcolumn = row['子栏目']
             path = row['文件夹路径'] 
-            try:    
-                main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path)
-            except:
-                print(f'{url}出现错误 重试')
-                main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path)
+            # try:    
+            main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path)
+            # except:
+            #     print(f'{url}出现错误 重试')
+            #     main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path)
     

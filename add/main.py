@@ -94,6 +94,8 @@ class DedeAddArticle:
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
         self.__click(sourcecode_selector)
+        for imgpath in img_L:
+            self.add_img(imgpath)
         for line in L:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
@@ -127,14 +129,23 @@ class DedeAddArticle:
         # error_selector = '#cke_dialog_close_button_84'
         try:
             self.__click(sourcecode_selector) # 1
+            print(1)
             self.__click(img_selector) # 2
+            print(2)
+            time.sleep(2)
             self.__click(imgupload_selector) # 3
+            print(3)
+            time.sleep(2)
             self.browser.switch_to_frame('cke_138_fileInput') # 4
+            print(4)
             self.__sendkeys(file_selector, imgpath)
             self.__click(upload2server_selector) # 5
+            print(5)
             self.browser.switch_to.parent_frame()
             self.__click(imgconfirm_selector) # 6
+            print(6)
             self.__click(sourcecode_selector) # 7
+            print(7)
         except:
             print(f'添加图片:{imgpath} 失败')
             try:
@@ -211,3 +222,7 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
             dede.error()
             dede.column()
     print('添加文章结束')
+#cke_info_124
+#cke_87_textInput
+#cke_Upload_143
+# body > form > input[type="file"]
