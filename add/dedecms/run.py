@@ -22,4 +22,3 @@ if __name__ == "__main__":
             except:
                 print(f'{url}出现错误 重试')
                 main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path)
-    
