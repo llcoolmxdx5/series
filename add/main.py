@@ -94,8 +94,6 @@ class DedeAddArticle:
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
         self.__click(sourcecode_selector)
-        for imgpath in img_L:
-            self.add_img(imgpath)
         for line in L:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
@@ -106,55 +104,34 @@ class DedeAddArticle:
         self.__click(continue_selector)
     
     def add_img(self, imgpath):
-        '''
-        1.点源码
-        2.点击图像 main ifame #cke_27
-        3.上传 main ifame #cke_Upload_143 send_keys
-        切换到子ifame
-        4.选择文件 ifame#cke_138_fileInput body > form > input[type="file"]
-        5.上传到服务器上 ifame#cke_138_fileInput #cke_140_labelifame
-        上传完后切回父ifame
-        6.自动跳到图像界面选择确定 ifame#main #cke_172_label
-        7.点源码
-        错误：关闭 ifame#main #cke_dialog_close_button_84
-        '''
         sourcecode_selector = '#cke_8'
-        img_selector = '#cke_27'
-        imgupload_selector = '#cke_Upload_143'
+        # img_selector = '#cke_27'
+        # imgupload_selector = '#cke_dialog_tabs_84 > #cke_Upload_143'
         file_selector = 'body > form > input[type="file"]'
         upload2server_selector = '#cke_140_labelifame'
         imgconfirm_selector = '#cke_172_label'
         # body_selector = '#cke_contents_body > textarea'
         # imgerror_selector = '#cke_dialog_close_button_84'
-        # error_selector = '#cke_dialog_close_button_84'
+        error_selector = '#cke_dialog_close_button_84'
+        js1 = 'document.getElementById("cke_27").click();'
+        js2 = 'var tabs = document.getElementById("cke_dialog_tabs_84");tabs.children[2].click()'
         try:
             self.__click(sourcecode_selector) # 1
-            print(1)
-            self.__click(img_selector) # 2
-            print(2)
-            time.sleep(2)
-            self.__click(imgupload_selector) # 3
-            print(3)
-            time.sleep(2)
+            # self.__click(img_selector) # 2
+            self.browser.execute_script(js1)
+            self.browser.execute_script(js2)
+            # self.__click(imgupload_selector) # 3
             self.browser.switch_to_frame('cke_138_fileInput') # 4
-            print(4)
             self.__sendkeys(file_selector, imgpath)
             self.__click(upload2server_selector) # 5
-            print(5)
             self.browser.switch_to.parent_frame()
             self.__click(imgconfirm_selector) # 6
-            print(6)
             self.__click(sourcecode_selector) # 7
-            print(7)
         except:
             print(f'添加图片:{imgpath} 失败')
-            try:
-                alert = self.browser.switch_to_alert()
-                alert.accept()
-            except:
-                pass
             self.browser.switch_to.default_content()
             self.browser.switch_to_frame('main')
+            self.__click(error_selector)
 
 
 def autokeyword(path):
@@ -181,7 +158,7 @@ def read_file(path1):
         else:
             keyword = ''
             summary = ''
-        L = []
+        L = [f'<style>.acc_acc {{font-size: {FONT_SIZE}px;}}</style>']
         content_L = []
         for j in f.readlines():
             if len(j) < 4:
@@ -190,8 +167,8 @@ def read_file(path1):
         if AUTO_SUMMARY and len(summary) < 2:
             summary = content_L[0]
         for i in content_L:
-            L.append(f'<span style="font-size: {FONT_SIZE}px;">　　{i[:-1].strip()}</span><br style="font-size: {FONT_SIZE}px;">')
-            L.append(f'<span style="font-size: {FONT_SIZE}px;">　　</span><br style="font-size: {FONT_SIZE}px;">')
+            L.append(f'<span class="acc_acc">　　{i[:-1].strip()}</span><br class="acc_acc">')
+            L.append(f'<span class="acc_acc">　　</span><br class="acc_acc">')
     if AUTO_KEYWORD:
         keys = autokeyword(path2)
         if CONFIRM_KEYSUMM:
@@ -222,7 +199,3 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
             dede.error()
             dede.column()
     print('添加文章结束')
-#cke_info_124
-#cke_87_textInput
-#cke_Upload_143
-# body > form > input[type="file"]
