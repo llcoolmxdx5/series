@@ -142,16 +142,8 @@ def autokeyword(path):
 
 
 def read_file(path1): 
-    path1 = path1 + '\\'
-    list2 = os.listdir(path1)
     img_L = []
-    for i in list2:
-        if i[-3:] in ['jpg', 'png', 'gif']:
-            img_L.append(path1+i)
-        if i[-3:] == 'txt':
-            title = i[:-4]
-            path2 = path1 + '\\' + i
-    with open(path2, 'r') as f:
+    with open(path1, 'r') as f:
         if CONFIRM_KEYSUMM:
             keyword = f.readline()[:-1]
             summary = f.readline()[:-1]
@@ -170,12 +162,12 @@ def read_file(path1):
             L.append(f'<span class="acc_acc">　　{i[:-1].strip()}</span><br class="acc_acc">')
             L.append(f'<span class="acc_acc">　　</span><br class="acc_acc">')
     if AUTO_KEYWORD:
-        keys = autokeyword(path2)
+        keys = autokeyword(path1)
         if CONFIRM_KEYSUMM:
             keyword = keyword + keys
         else:
             keyword = keyword + ',' + keys
-    return title, keyword, summary, L, img_L
+    return keyword, summary, L, img_L
 
 
 def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path):
@@ -187,10 +179,14 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
     print('选择栏目成功')
     path = rf'{path}' + '\\'
     for i in os.listdir(path):
-        try:
+        if i[-3:] == 'txt':
+            title = i[:-4]
             path1 = path + i
-            print(f'读取路径:{path1}')
-            title, keyword, summary, L, img_L = read_file(path1)
+        else:
+            continue
+        try:
+            print(f'读取文件:{path1}')
+            keyword, summary, L, img_L = read_file(path1)
             dede.add_article(title, keyword, summary, L, img_L)
             print(f'添加文章:{title} 成功,准备添加下一篇')
             dede.continue_add()
