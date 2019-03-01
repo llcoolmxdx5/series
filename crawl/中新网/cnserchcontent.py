@@ -2,27 +2,28 @@ import csv
 import multiprocessing
 import random
 import threading
+import time
 from sys import exit
 
 import requests
 from pyquery import PyQuery as pq
 
-file_name_write = r'D:\chengxv - 副本\后端\python\crawl\cnserch\solomn\solomncontent.csv'
-file_name_read = r'D:\chengxv - 副本\后端\python\crawl\cnserch\solomn\solomntitle.csv'
+from config import path, keyword
+
 
 def html_download(url):
     headers = {'User-Agent': "User-Agent:Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)"}
     try:
         html = requests.get(url, headers=headers)
         html.encoding = 'gb2312'
-    except:
-        pass
-    else:
         return html.text
+    except Exception as e:
+        print(e)
+        return ''
 
 
-def save_to_csv(items):
-    with open(file_name_write, "a", newline='', encoding='gb18030') as csvfile:
+def save_to_csv(items, file_content):
+    with open(file_content, "a", newline='', encoding='gb18030') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(items)
 
@@ -72,29 +73,40 @@ def parse_data(html, url):
     return title, content_p, img_urls, url
 
 
-def start(url):
+def start(url, file_content):
     try:
         html = html_download(url)
+        i = 1
+        while not html or len(html) < 2000:
+            print(f'抓取{url}失败,重试第{i}次')
+            time.sleep(i)
+            html_download(url)
+            if i >= 5:
+                print(f'抓取{url}失败,跳过')
+                break
+            i += 1
         items = parse_data(html, url)
-        save_to_csv(items)
+        save_to_csv(items, file_content)
     except Exception as e:
         print(e)
 
 
-def main():
-    with open(file_name_read, 'r') as csvfile:
-        reder = csv.reader(csvfile)
+def main(key, file_content):
+    global file_title
+    # global file_content
+    file_title = path + '\\' + key + 'title.csv'
+    # file_content = path + '\\' + key + 'content.csv'
+    with open(file_title, 'r', encoding='gb18030') as csvfile:
+        reader = csv.reader(csvfile)
         L = []
-        for row in reder:
+        for row in reader:
             if 'shipin' in row[1]:
                 continue
             L.append(row[1])
     pool = multiprocessing.Pool()
-    # 多进程
-    thread = threading.Thread(target=pool.map, args = (start, [x for x in L]))
-    thread.start()
-    thread.join()
-
-
-if __name__ == "__main__":
-    main()
+    for url in L:
+        pool.apply_async(start, (url, file_content))
+    print(f'读取{file_title},保存到{file_content}')
+    pool.close()
+    pool.join()
+    print(f'抓取{key}结束')

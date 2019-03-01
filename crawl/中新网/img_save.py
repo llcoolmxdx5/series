@@ -1,11 +1,12 @@
 import csv
-import requests
-from random import shuffle
-from os import mkdir
 import os
+from os import mkdir
+from random import shuffle
 
-read_filename = r'D:\chengxv - 副本\后端\python\crawl\cnserch\solomn\solomncontent.csv'
-write_filename = r'D:\chengxv - 副本\后端\python\crawl\cnserch\solomn\content' + '\\'
+import requests
+
+from config import path1
+
 
 def html_download(picurl, url):
     headers = {'User-Agent': "User-Agent:Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)"}
@@ -25,6 +26,7 @@ def html_download(picurl, url):
     else:
         return res.content
 
+
 def code_transfer(string):
     replaces = ['"', '：', ' ', ' ', ':', '/', '<', '>', '?', '“', '”', '|', '*']
     for i in replaces:
@@ -32,38 +34,40 @@ def code_transfer(string):
     return string
 
 
-def main():
-    with open(read_filename, 'r') as csvfile:
+def gbk_cannot(string):
+    replaces = ['\u30fb', '\ufffd', '\u3000', '\n']
+    for i in replaces:
+        string = ''.join(string.split(i))
+    return string
+
+def main(file_content):
+    with open(file_content, 'r', encoding='gb18030') as csvfile:
         reader = csv.reader(csvfile)
         while True:
             try:
                 for row in reader:
-                    title = code_transfer(row[0][:12])
-                    path = write_filename + title
+                    title = code_transfer(row[0])[:-4]
+                    if len(title) < 2:
+                        continue
+                    path = path1 + '\\' + title + '.txt'
                     if os.path.exists(path):
                         continue
-                    mkdir(path)
                     content = []
                     l = row[1][1:-1].split(',')
+                    num = 1
                     for p in l:
-                        content.append(p[2:-5])
-                    shuffle(content)
+                        if len(p) < 5:
+                            continue
+                        if num == 1:
+                            content.append(gbk_cannot(p[1:-5]))
+                        else:
+                            content.append(gbk_cannot(p[2:-5]))
+                        num += 1
                     content = '\n\n'.join(content)
-                    with open(path + '\\' + title + '.txt', 'w') as f1:
+                    if len(content) < 20:
+                        continue
+                    with open(path, 'w') as f1:
                         f1.write(content)
-
-                    url = row[3]
-
-                    pic_L = row[2]
-                    if len(pic_L) > 2:
-                        pic_s = pic_L[1:-1]
-                        pic_L = pic_s.split(',')
-                        for pic_url in pic_L:
-                            content = html_download(pic_url, url)
-                            if not content:
-                                continue
-                            with open(path + '\\'+pic_url[-8:-1], 'wb') as f:
-                                f.write(content)
+                break
             except Exception as e:
                 print(e)
-
