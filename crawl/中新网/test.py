@@ -1,6 +1,7 @@
-import time
-from config import path, keyword
+import rsa
+import json
 
-file_title = path + '\\' + str(time.time())[-5:] + 'title.csv'
-print(file_title)
+dic = {"adasf":"121r","afsa":"ac"}
+
+
 
