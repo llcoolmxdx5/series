@@ -5,10 +5,7 @@ import csv
 import multiprocessing
 import threading
 from pyquery import PyQuery as pq
-from config import path, path1, keyword
-
-WRITE_TO_FILE = 'baiduurl.csv'
-file_title = path + '\\' + 'title.csv'
+from functools import partial
 
 def html_download(page, key):
     headers = {'User-Agent': "User-Agent:Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)"}
@@ -32,9 +29,9 @@ def parse_page(html):
     doc = pq(html)
     page = doc('#page > strong > span.pc').text()
     try:
-        return int(page)
+        return int(page) + 1
     except:
-        return 0
+        return 1
     
 
 def parse_html(html):
@@ -44,39 +41,34 @@ def parse_html(html):
         yield a.attr('href'), a.text()
 
 
-def save_to_csv(items):
-    global file_title
-    with open(file_title, "a", newline='', encoding='utf-8') as csvfile:
+def save_to_csv(items, file_title):
+    with open(file_title, "a", newline='', encoding='gb18030') as csvfile:
         # print(' 正在写入csv文件中.....')
         writer = csv.writer(csvfile)
         writer.writerow(items)
 
 
-def start(page,key=''):
+def start(page,key,file_title):
     try:
         html = html_download(page, key)
-        print(f'正在抓取第{page}')
+        print(f'正在抓取第{page}-第{page+10}')
         for items in parse_html(html):
-            save_to_csv(items)
+            if '今日滚动新闻' in items[1]:
+                continue
+            save_to_csv(items, file_title)
     except Exception as e:
         print(e)
 
 
-def main(key):
-    global file_title
-    file_title = path + '\\' + '腾讯新闻' + key + 'title.csv'
+def main(key, file_title):
     html = html_download(750, key)
     page_total = parse_page(html)
-    print(f'总计{page_total}')
+    print(f'总计{page_total}0不到')
     #多线程
     pool = multiprocessing.Pool()
     # 多进程
-    thread = threading.Thread(target=pool.map,args = (start, [x for x in range(0, page_total*10, 10)]))
+    thread = threading.Thread(target=pool.map,args = (partial(start, key=key, file_title=file_title), 
+                                                      [x for x in range(0, page_total*10, 10)]))
     thread.start()
     thread.join()
 
-if __name__ == '__main__':
-    main('新闻')
-    # html = html_download(750, '彩彩')
-    # page_total = parse_page(html)
-    # print(page_total)
