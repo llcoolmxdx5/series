@@ -51,7 +51,7 @@ def save_to_csv(items, file_title):
 def start(page,key,file_title):
     try:
         html = html_download(page, key)
-        print(f'正在抓取第{page}-第{page+10}')
+        print(f'正在抓取第{page}-第{page+1}')
         for items in parse_html(html):
             if '今日滚动新闻' in items[1]:
                 continue
