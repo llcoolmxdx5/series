@@ -1,6 +1,6 @@
 from cnserchtitle import main as titlemain
 from cnserchcontent import main as contentmain
-from img_save import main as savemain
+from save import main as savemain
 from config import keyword, path
 
 if __name__ == "__main__":

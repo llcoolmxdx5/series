@@ -38,7 +38,7 @@ def parse_html(html):
     doc = pq(html)
     aes = doc('h3.t a').items()
     for a in aes:
-        yield a.attr('href'), a.text()
+        yield  a.text(), a.attr('href')
 
 
 def save_to_csv(items, file_title):
@@ -51,11 +51,11 @@ def save_to_csv(items, file_title):
 def start(page,key,file_title):
     try:
         html = html_download(page, key)
-        print(f'正在抓取第{page}-第{page+1}')
+        print(f'正在抓取第{page}-第{page+10}')
         for items in parse_html(html):
-            if '今日滚动新闻' in items[1]:
-                continue
-            save_to_csv(items, file_title)
+            print(items[0])
+            if items[0][-7:] == '_新闻_腾讯网':
+                save_to_csv(items, file_title)
     except Exception as e:
         print(e)
 

@@ -93,9 +93,7 @@ def start(url, file_content):
 
 def main(key, file_content):
     global file_title
-    # global file_content
     file_title = path + '\\' + key + 'title.csv'
-    # file_content = path + '\\' + key + 'content.csv'
     with open(file_title, 'r', encoding='gb18030') as csvfile:
         reader = csv.reader(csvfile)
         L = []
