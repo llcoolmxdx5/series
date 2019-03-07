@@ -164,9 +164,9 @@ def read_file(path1):
     if AUTO_KEYWORD:
         keys = autokeyword(path1)
         if CONFIRM_KEYSUMM:
-            keyword = keyword + keys
+            keyword = f'{keyword},{keys}'
         else:
-            keyword = keyword + ',' + keys
+            keyword = keyword + keys
     return keyword, summary, L, img_L
 
 
