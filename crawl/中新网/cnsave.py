@@ -5,7 +5,7 @@ from random import shuffle
 
 import requests
 
-from config import path1
+from cnconfig import path1
 
 
 def html_download(picurl, url):

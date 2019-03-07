@@ -1,7 +1,7 @@
 from cnserchtitle import main as titlemain
 from cnserchcontent import main as contentmain
-from save import main as savemain
-from config import keyword, path
+from cnsave import main as savemain
+from cnconfig import keyword, path
 
 if __name__ == "__main__":
     titlemain()

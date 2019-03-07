@@ -6,7 +6,7 @@ import time
 import requests
 from pyquery import PyQuery as pq
 
-from config import path
+from txconfig import path
 
 
 def html_download(url):

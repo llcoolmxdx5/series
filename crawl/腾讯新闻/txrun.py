@@ -1,8 +1,9 @@
-from config import path, path1, keyword
-from txtitle import main as titlemain
+import os
+
+from txconfig import keyword, path
 from txcontent import main as contentmain
 from txsave import main as savemain
-
+from txtitle import main as titlemain
 
 if __name__ == "__main__":
     for key in keyword:
@@ -11,3 +12,5 @@ if __name__ == "__main__":
         titlemain(key, file_title)
         contentmain(key, file_content)
         savemain(key, file_content)
+        os.remove(file_title)
+        os.remove(file_content)

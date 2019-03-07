@@ -8,7 +8,7 @@ from sys import exit
 import requests
 from pyquery import PyQuery as pq
 
-from config import path, keyword
+from cnconfig import path, keyword
 
 
 def html_download(url):

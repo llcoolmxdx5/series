@@ -1,11 +1,13 @@
-import requests
-import re
-from urllib.parse import urlencode
 import csv
 import multiprocessing
+import re
 import threading
-from pyquery import PyQuery as pq
 from functools import partial
+from urllib.parse import urlencode
+
+import requests
+from pyquery import PyQuery as pq
+
 
 def html_download(page, key):
     headers = {'User-Agent': "User-Agent:Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)"}
@@ -71,4 +73,3 @@ def main(key, file_title):
                                                       [x for x in range(0, page_total*10, 10)]))
     thread.start()
     thread.join()
-

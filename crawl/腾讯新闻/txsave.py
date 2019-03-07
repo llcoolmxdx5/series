@@ -2,7 +2,7 @@ import csv
 import os
 import time
 
-from config import path1
+from txconfig import path
 
 
 def code_transfer(string):
@@ -20,10 +20,10 @@ def gbk_cannot(string):
 
 
 def main(key, file_content):
-    path2 = f'{path1}\\{key}'
-    if not os.path.exists(path2):
-        os.mkdir(path2)
-    print(f'保存{key}相关腾讯新闻到{path2}开始')
+    path1 = f'{path}\\{key}'
+    if not os.path.exists(path1):
+        os.mkdir(path1)
+    print(f'保存{key}相关腾讯新闻到{path1}开始')
     with open(file_content, 'r', encoding='gb18030') as csvfile:
         reader = csv.reader(csvfile)
         while True:
@@ -32,8 +32,8 @@ def main(key, file_content):
                     title = code_transfer(row[0])
                     if len(title) < 2:
                         continue
-                    path = f'{path2}\\{title}.txt'
-                    if os.path.exists(path):
+                    path2 = f'{path1}\\{title}.txt'
+                    if os.path.exists(path2):
                         continue
                     content = []
                     l = row[1][1:-1].split(',')
@@ -49,13 +49,12 @@ def main(key, file_content):
                     content = '\n\n'.join(content)
                     if len(content) < 20:
                         continue
-                    with open(path, 'w') as f1:
+                    with open(path2, 'w') as f1:
                         f1.write(content)
                 break
             except Exception as e:
                 print(e)
-    print(f'保存{key}相关腾讯新闻到{path2}完成')
+    print(f'保存{key}相关腾讯新闻到{path1}完成')
 
 if __name__ == "__main__":
     main('时时彩', r'D:\新建文件夹\腾讯新闻时时彩content.csv')
-

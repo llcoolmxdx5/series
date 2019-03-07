@@ -9,7 +9,7 @@ from urllib import error
 import requests
 from pyquery import PyQuery as pq
 
-from config import keyword, path
+from cnconfig import keyword, path
 
 file_title = path + '\\' + 'title.csv'
 
