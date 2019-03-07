@@ -34,9 +34,15 @@ def parse_data(html, url):
     content_p = []
     pes = doc('#Cnt-Main-Article-QQ > p').items()
     for p in pes:
+        if 'var flash_vid' in p.text():
+            continue # 去除插入的flash
+        if 'strong#truth' in p.text():
+            continue # 去除事实+
+        if 'var related_video_info' in p.text():
+            continue # 去除插入的腾讯视频代码
         if len(p.text()) < 10:
             continue
-        content_p.append(p.text()+'\n\n')
+        content_p.append(p.text())
     return title, content_p, url
 
 
@@ -61,8 +67,8 @@ def main(key, file_content):
                 continue
             d[f'{row[0]}'] = row[1]
     L = []
-    for key,value in d.items():
-        L.append(value)
+    for dkey,dvalue in d.items():
+        L.append(dvalue)
     del d
     pool = multiprocessing.Pool()
     for url in L:

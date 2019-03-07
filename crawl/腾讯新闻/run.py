@@ -1,6 +1,8 @@
 from config import path, path1, keyword
 from txtitle import main as titlemain
 from txcontent import main as contentmain
+from txsave import main as savemain
+
 
 if __name__ == "__main__":
     for key in keyword:
@@ -8,3 +10,4 @@ if __name__ == "__main__":
         file_content = f'{path}\\腾讯新闻{key}content.csv'
         titlemain(key, file_title)
         contentmain(key, file_content)
+        savemain(key, file_content)
