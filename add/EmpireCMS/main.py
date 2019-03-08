@@ -41,6 +41,7 @@ class EmpireAddArticle:
         self.browser.find_element_by_css_selector(selector).send_keys(sendkeys)
     
     def login(self):
+        # 已完成
         uname_selector = 'body > table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(1) > td:nth-child(2) > input'
         upwd_selector = 'body > table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > input'
         submit_selctor = 'body > table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(6) > td:nth-child(2) > input[type="image"]'

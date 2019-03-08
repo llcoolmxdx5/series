@@ -1,0 +1,9 @@
+先打开config.py文件 参见说明 修改
+
+打开run.py 在vscode中右键选择在终端运行文件 即可
+
+若没进行以下操作 则:
+在cmd中输入 pip install pyquery
+           pip install requests
+
+此网站在测试时突然出问题了 访问频率过快时会禁止访问
