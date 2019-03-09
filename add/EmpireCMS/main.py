@@ -54,7 +54,7 @@ class EmpireAddArticle:
     def column(self):
         time.sleep(10)
         maincolumn_selector = f'#pr{"主栏目id"} > a'
-        subcolumn_selector = '#pr{子栏目id} > a'
+        subcolumn_selector = f'#pr{"子栏目id"} > a'
         add_selector = 'body > table.tableborder > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(1) > div > input[type="button"]'
         self.browser.switch_to_frame('left')
         if int(self.subcolumn_selector):
