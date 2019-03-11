@@ -64,13 +64,13 @@ class EmpireAddArticle:
         self.browser.switch_to_frame('main')
         self.__click(add_selector)
 
-    def add_article(self, title, keyword, summary, L, img_L, subtitle=''):
+    def add_article(self, title, keyword, summary, L, subtitle=''):
         title_selector = '#baseinfo > table:nth-child(3) > tbody > tr:nth-child(1) > td:nth-child(2) > table > tbody > tr:nth-child(1) > td > input[type="text"]:nth-child(1)'
         subtitle_selector = '#ftitle'
         keyword_selector = '#baseinfo > table:nth-child(3) > tbody > tr:nth-child(3) > td:nth-child(2) > table > tbody > tr:nth-child(2) > td > input[type="text"]'
         save_selector = 'body > form > table > tbody > tr > td:nth-child(2) > input[type="submit"]:nth-child(1)'
-        sourcecode_selector = '#cke_16' 
-        body_selector = '#cke_1_contents > textarea'
+        sourcecode_selector = '#xToolbar > table:nth-child(1) > tbody > tr > td:nth-child(2) > div > table > tbody > tr > td.TB_Button_Text' 
+        body_selector = '#xEditingArea > textarea'
         summary_selector = '#smalltext'
         self.__sendkeys(title_selector, title)
         self.__sendkeys(subtitle_selector, subtitle)
@@ -81,7 +81,47 @@ class EmpireAddArticle:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
         self.__click(save_selector)
+    
+    def continue_add(self):
+        # todo
+        continue_selector = 'body > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > div > a:nth-child(1) > u'
+        self.__click(continue_selector)
 
+
+def autokeyword(path):
+    with open(path) as f:
+        content = f.read()
+    keys = jieba.analyse.extract_tags(content, topK=3, allowPOS=('ns', 'n', 'vn', 'v', 'i', 'l', 'nr', 'nt', 'nz'))
+    return ','.join(keys)
+
+
+def read_file(path1): 
+    img_L = []
+    with open(path1, 'r') as f:
+        if CONFIRM_KEYSUMM:
+            keyword = f.readline()[:-1]
+            summary = f.readline()[:-1]
+        else:
+            keyword = ''
+            summary = ''
+        L = [f'<style>.acc_acc {{font-size: {FONT_SIZE}px;}}</style>']
+        content_L = []
+        for j in f.readlines():
+            if len(j) < 4:
+                continue
+            content_L.append(j)
+        if AUTO_SUMMARY and len(summary) < 2:
+            summary = content_L[0]
+        for i in content_L:
+            L.append(f'<span class="acc_acc">　　{i[:-1].strip()}</span><br class="acc_acc">')
+            L.append(f'<span class="acc_acc">　　</span><br class="acc_acc">')
+    if AUTO_KEYWORD:
+        keys = autokeyword(path1)
+        if CONFIRM_KEYSUMM:
+            keyword = f'{keyword},{keys}'
+        else:
+            keyword = keyword + keys
+    return keyword, summary, L, img_L
 
 def main():
     pass
