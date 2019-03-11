@@ -1,5 +1,6 @@
 import warnings
 import time
+import os
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -33,22 +34,20 @@ class EmpireAddArticle:
 
     def __del__(self):
         self.browser.close()
-    
+
     def __click(self, selector):
         self.browser.find_element_by_css_selector(selector).click()
-    
+
     def __sendkeys(self, selector, sendkeys):
         self.browser.find_element_by_css_selector(selector).send_keys(sendkeys)
-    
+
     def login(self):
-        # 已完成
         uname_selector = 'body > table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(1) > td:nth-child(2) > input'
         upwd_selector = 'body > table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > input'
         submit_selctor = 'body > table:nth-child(2) > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(6) > td:nth-child(2) > input[type="image"]'
         self.browser.get(self.url)
         self.__sendkeys(uname_selector, self.uname)
         self.__sendkeys(upwd_selector, self.upwd)
-        # time.sleep(20)
         self.__click(submit_selctor)
 
     def column(self):
@@ -81,11 +80,14 @@ class EmpireAddArticle:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
         self.__click(save_selector)
-    
+
     def continue_add(self):
         # todo
         continue_selector = 'body > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > div > a:nth-child(1) > u'
         self.__click(continue_selector)
+
+    def error(self):
+        self.browser.switch_to_default_content()
 
 
 def autokeyword(path):
@@ -95,8 +97,7 @@ def autokeyword(path):
     return ','.join(keys)
 
 
-def read_file(path1): 
-    img_L = []
+def read_file(path1):
     with open(path1, 'r') as f:
         if CONFIRM_KEYSUMM:
             keyword = f.readline()[:-1]
@@ -121,9 +122,33 @@ def read_file(path1):
             keyword = f'{keyword},{keys}'
         else:
             keyword = keyword + keys
-    return keyword, summary, L, img_L
+    return keyword, summary, L
 
-def main():
-    pass
+
+def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path):
+    empire = EmpireAddArticle(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn)
+    print('正在初始化')
+    empire.login()
+    print('登录成功')
+    empire.column()
+    print('选择栏目成功')
+    path = rf'{path}' + '\\'
+    for i in os.listdir(path):
+        if i[-3:] == 'txt':
+            title = i[:-4]
+            path1 = path + i
+        else:
+            continue
+        try:
+            print(f'读取文件:{path1}')
+            keyword, summary, L = read_file(path1)
+            empire.add_article(title, keyword, summary, L)
+            print(f'添加文章:{title} 成功,准备添加下一篇')
+            # empire.continue_add()
+        except Exception as e:
+            print(e)
+            empire.error()
+            empire.column()
+    print('添加文章结束')
 
 

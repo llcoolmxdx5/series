@@ -188,10 +188,12 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
             print(f'读取文件:{path1}')
             keyword, summary, L, img_L = read_file(path1)
             dede.add_article(title, keyword, summary, L, img_L)
-            print(f'添加文章:{title} 成功,准备添加下一篇')
             dede.continue_add()
         except Exception as e:
+            print(f'添加文章:{title} 失败')
             print(e)
             dede.error()
             dede.column()
+        else:
+            print(f'添加文章:{title} 成功,准备添加下一篇')
     print('添加文章结束')
