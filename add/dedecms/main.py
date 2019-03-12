@@ -177,7 +177,7 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
     print('登录成功')
     dede.column()
     print('选择栏目成功')
-    path = rf'{path}' + '\\'
+    path = f'{path}\\'
     for i in os.listdir(path):
         if i[-3:] == 'txt':
             title = i[:-4]
