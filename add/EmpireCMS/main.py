@@ -15,14 +15,13 @@ except Exception as e:
 
 
 class EmpireAddArticle:
-    def __init__(self, url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn):
+    def __init__(self, url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id):
         self.uname = user
         self.upwd = password
         self.url = url
-        self.maincolumn = maincolumn
         self.subcolumn_selector = subcolumn_selector
         self.maincolumn_id = maincolumn_id
-        self.subcolumn = subcolumn
+        self.subcolumn_id = subcolumn_id
         if DISPLAY_BROSER:
             self.browser = webdriver.Chrome()
             self.browser.maximize_window()
@@ -52,11 +51,20 @@ class EmpireAddArticle:
 
     def column(self):
         time.sleep(10)
-        maincolumn_selector = f'#pr{"主栏目id"} > a'
-        subcolumn_selector = f'#pr{"子栏目id"} > a'
+        maincolumn_selector = f'#pr{self.maincolumn_id} > a'
+        subcolumn_selector = f'#pr{self.subcolumn_id} > a'
         add_selector = 'body > table.tableborder > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(1) > div > input[type="button"]'
+        info_selector = '#doinfomenu > table > tbody > tr:nth-child(1) > td > div > img'
+        self.browser.switch_to_default_content()
+        self.__click(info_selector)
         self.browser.switch_to_frame('left')
         if int(self.subcolumn_selector):
+            try:
+                self.__click(subcolumn_selector)
+            except:
+                self.__click(maincolumn_selector)
+                self.__click(subcolumn_selector)
+        else:
             self.__click(maincolumn_selector)
         self.__click(subcolumn_selector)
         self.browser.switch_to.default_content()
@@ -82,7 +90,7 @@ class EmpireAddArticle:
         self.__click(save_selector)
 
     def continue_add(self):
-        # todo
+        # TODO
         continue_selector = 'body > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > div > a:nth-child(1) > u'
         self.__click(continue_selector)
 
@@ -125,8 +133,8 @@ def read_file(path1):
     return keyword, summary, L
 
 
-def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn, path):
-    empire = EmpireAddArticle(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, subcolumn)
+def main(url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id, path):
+    empire = EmpireAddArticle(url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id)
     print('正在初始化')
     empire.login()
     print('登录成功')
@@ -143,12 +151,13 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
             print(f'读取文件:{path1}')
             keyword, summary, L = read_file(path1)
             empire.add_article(title, keyword, summary, L)
-            print(f'添加文章:{title} 成功,准备添加下一篇')
             # empire.continue_add()
         except Exception as e:
             print(e)
             empire.error()
             empire.column()
+        else:
+            print(f'添加文章:{title} 成功,准备添加下一篇')
     print('添加文章结束')
 
 
