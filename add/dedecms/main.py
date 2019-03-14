@@ -177,8 +177,12 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
     print('登录成功')
     dede.column()
     print('选择栏目成功')
-    path = f'{path}\\'
-    for i in os.listdir(path):
+    result = [(i, os.stat(f'{path}\\{i}').st_mtime) for i in os.listdir(path)]
+    total_doc = len(result)
+    error_doc = 0
+    success_doc = 0
+    print(f'预计将添加{total_doc}篇文章')
+    for i in sorted(result, key=lambda x: x[1]):
         if i[-3:] == 'txt':
             title = i[:-4]
             path1 = path + i
@@ -190,10 +194,14 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
             dede.add_article(title, keyword, summary, L, img_L)
             dede.continue_add()
         except Exception as e:
+            error_doc += 1
             print(f'添加文章:{title} 失败')
             print(e)
             dede.error()
             dede.column()
         else:
+            success_doc += 1
             print(f'添加文章:{title} 成功,准备添加下一篇')
+        finally:
+            print(f'添加文章进度:{success_doc}/{total_doc},失败{error_doc}篇')
     print('添加文章结束')
