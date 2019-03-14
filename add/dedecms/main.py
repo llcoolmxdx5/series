@@ -182,10 +182,10 @@ def main(url, user, password, maincolumn, subcolumn_selector, maincolumn_id, sub
     error_doc = 0
     success_doc = 0
     print(f'预计将添加{total_doc}篇文章')
-    for i in sorted(result, key=lambda x: x[1]):
-        if i[-3:] == 'txt':
-            title = i[:-4]
-            path1 = path + i
+    for i in sorted(result, key=lambda x: x[1], reverse=True):
+        if i[0][-3:] == 'txt':
+            title = i[0][:-4]
+            path1 = f'{path}\\{i[0]}'
         else:
             continue
         try:

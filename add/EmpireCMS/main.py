@@ -66,7 +66,6 @@ class EmpireAddArticle:
                 self.__click(subcolumn_selector)
         else:
             self.__click(maincolumn_selector)
-        self.__click(subcolumn_selector)
         self.browser.switch_to.default_content()
         self.browser.switch_to_frame('main')
         self.__click(add_selector)
@@ -83,10 +82,12 @@ class EmpireAddArticle:
         self.__sendkeys(subtitle_selector, subtitle)
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
+        self.browser.switch_to_frame('newstext___Frame')
         self.__click(sourcecode_selector)
         for line in L:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
+        self.browser.switch_to.parent_frame()
         self.__click(save_selector)
 
     def continue_add(self):
@@ -140,10 +141,15 @@ def main(url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id, p
     print('登录成功')
     empire.column()
     print('选择栏目成功')
-    for i in os.listdir(path):
-        if i[-3:] == 'txt':
-            title = i[:-4]
-            path1 = path + i
+    result = [(i, os.stat(f'{path}\\{i}').st_mtime) for i in os.listdir(path)]
+    total_doc = len(result)
+    error_doc = 0
+    success_doc = 0
+    print(f'预计将添加{total_doc}篇文章')
+    for i in sorted(result, key=lambda x: x[1], reverse=True):
+        if i[0][-3:] == 'txt':
+            title = i[0][:-4]
+            path1 = f'{path}\\{i[0]}'
         else:
             continue
         try:
@@ -152,11 +158,16 @@ def main(url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id, p
             empire.add_article(title, keyword, summary, L)
             # empire.continue_add()
         except Exception as e:
+            error_doc += 1
+            print(f'添加文章:{title} 失败')
             print(e)
             empire.error()
             empire.column()
         else:
+            success_doc += 1
             print(f'添加文章:{title} 成功,准备添加下一篇')
+        finally:
+            print(f'添加文章进度:{success_doc}/{total_doc},失败{error_doc}篇')
     print('添加文章结束')
 
 
