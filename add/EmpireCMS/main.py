@@ -29,9 +29,9 @@ class EmpireAddArticle:
             chrome_options=Options()
             chrome_options.add_argument('--headless')
             self.browser = webdriver.Chrome(chrome_options=chrome_options)
-        self.browser.implicitly_wait(10)
+        self.browser.implicitly_wait(20)
 
-    def __del__(self):
+    def exit(self):
         self.browser.close()
 
     def __click(self, selector):
@@ -145,7 +145,7 @@ def main(url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id, p
     total_doc = len(result)
     error_doc = 0
     success_doc = 0
-    print(f'预计将添加{total_doc}篇文章')
+    print(f'预计将发布{total_doc}篇文章')
     for i in sorted(result, key=lambda x: x[1], reverse=True):
         if i[0][-3:] == 'txt':
             title = i[0][:-4]
@@ -159,15 +159,16 @@ def main(url, user, password, subcolumn_selector, maincolumn_id, subcolumn_id, p
             # empire.continue_add()
         except Exception as e:
             error_doc += 1
-            print(f'添加文章:{title} 失败')
+            print(f'发布文章:{title} 失败')
             print(e)
             empire.error()
             empire.column()
         else:
             success_doc += 1
-            print(f'添加文章:{title} 成功,准备添加下一篇')
+            print(f'发布文章:{title} 成功,准备发布下一篇')
         finally:
-            print(f'添加文章进度:{success_doc}/{total_doc},失败{error_doc}篇')
-    print('添加文章结束')
+            print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
+    print('发布文章结束')
+    empire.exit()
 
 

@@ -8,7 +8,7 @@ if __name__ == "__main__":
         reader = csv.DictReader(csvfile)
         for row in reader:
             if len(row['网站后台地址']) < 2:
-                print(f"{row['网站后台地址']}为空")
+                print(f"网站后台地址为空,跳过该行")
                 continue
             url = row['网站后台地址']
             user = row['用户名']
