@@ -12,7 +12,7 @@ class Similarword:
                     self.word_dict[l1[1]] = l1[0]
             except:
                 pass
-    
+
     def __del__(self):
         del self.word_dict
 
