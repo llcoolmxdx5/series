@@ -75,19 +75,27 @@ class EmpireAddArticle:
         subtitle_selector = '#ftitle'
         keyword_selector = '#baseinfo > table:nth-child(3) > tbody > tr:nth-child(3) > td:nth-child(2) > table > tbody > tr:nth-child(2) > td > input[type="text"]'
         save_selector = 'body > form > table > tbody > tr > td:nth-child(2) > input[type="submit"]:nth-child(1)'
-        sourcecode_selector = '#xToolbar > table:nth-child(1) > tbody > tr > td:nth-child(2) > div > table > tbody > tr > td.TB_Button_Text' 
+        sourcecode_selector = '#xToolbar > table:nth-child(1) > tbody > tr > td:nth-child(2) > div > table > tbody > tr > td.TB_Button_Text'
+        sourcecode1_selector = '#cke_16_label'
         body_selector = '#xEditingArea > textarea'
+        body1_selector = '#cke_1_contents > textarea'
         summary_selector = '#smalltext'
         self.__sendkeys(title_selector, title)
         self.__sendkeys(subtitle_selector, subtitle)
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
-        self.browser.switch_to_frame('newstext___Frame')
-        self.__click(sourcecode_selector)
-        for line in L:
-            self.__sendkeys(body_selector, line)
-            self.__sendkeys(body_selector, Keys.ENTER)
-        self.browser.switch_to.parent_frame()
+        try:
+            self.browser.switch_to_frame('newstext___Frame')
+            self.__click(sourcecode_selector)
+            for line in L:
+                self.__sendkeys(body_selector, line)
+                self.__sendkeys(body_selector, Keys.ENTER)
+            self.browser.switch_to.parent_frame()
+        except:
+            self.__click(sourcecode1_selector)
+            for line in L:
+                self.__sendkeys(body1_selector, line)
+                self.__sendkeys(body1_selector, Keys.ENTER)
         self.__click(save_selector)
 
     def continue_add(self):
