@@ -43,6 +43,8 @@ def parse_html(html, url):
 
 def save_to_csv(items, file_content):
     with open(file_content, "a", newline='', encoding='gb18030') as csvfile:
+        if len(items[0]) < 2:
+            return
         print(f'正在写{items[0]}中')
         writer = csv.writer(csvfile)
         writer.writerow(items)
@@ -80,7 +82,7 @@ def main(file_title, file_content):
 
 
 if __name__ == "__main__":
-    url = 'https://news.sina.com.cn/c/2019-03-16/doc-ihsxncvh2920505.shtml'
+    url = 'https://finance.sina.com.cn/stock/usstock/c/2019-03-15/doc-ihrfqzkc4036235.shtml'
     html = html_download(url)
     item = parse_html(html, url)
     print(item)

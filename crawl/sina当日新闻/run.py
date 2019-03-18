@@ -15,7 +15,7 @@ file_content = f'{path}\\新浪新闻{now_date}content.csv'
 
 if __name__ == "__main__":
     # titlemain(now_date, total_page, file_title)
-    contentmain(file_title, file_content)
-    # savemain(now_date, file_content, result_path)
+    # contentmain(file_title, file_content)
+    savemain(now_date, file_content, result_path)
     # os.remove(file_title)
     # os.remove(file_content)
