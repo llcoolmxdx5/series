@@ -10,10 +10,8 @@ def code_transfer(string):
 
 
 def gbk_cannot(string):
-    replaces = ['\u30fb', '\ufffd', '\u3000', '\n','\u2022', '\u22c5','\u25ba', '\u25b7', '\uf9dd', '\xf6', '\xb3',
-                '\xba', '\u2f0a', '\xb4', '\xc5', '\u25aa', '\u301c', '\u2122', '\uff89', '\u2f08', '\xae', '\u2027',
-                '\xa0', '\U0001f4d5', '\U0001f4c5', '记者', '新浪', '中新网', '澎湃新闻', '中国网', '新京报', '央视网', 
-                '来源：', '新华社']
+    replaces = ['记者', '新浪', '中新网', '澎湃新闻', '中国网', '新京报', '央视网', '海外网', '环球网', 
+                '来源：', '新华社', '长安街知事']
     for i in replaces:
         string = string.replace(i, '')
     return string
@@ -51,7 +49,7 @@ def main(now_date, file_content, result_path):
                     content_str = '\n\n'.join(content)
                     if len(content) < 1:
                         continue
-                    with open(path, 'w') as f1:
+                    with open(path, 'w', encoding='utf-8') as f1:
                         f1.write(content_str)
                 break
             except Exception as e:

@@ -96,8 +96,8 @@ def read_file(path1,Key):
         for j in f.readlines():
             if len(j) < 4:
                 continue
+            content_L.append(j+content_key[index % 6])
             index += 1
-            content_L.append(j+content_key[index % 5])
         summary = content_L[0]
         for i in content_L:
             L.append(f'<span class="acc_acc">　　{i[:-1].strip()}</span><br class="acc_acc">')
@@ -117,6 +117,7 @@ def main(url, user, password, path, Key):
     total_doc = len(result)
     error_doc = 0
     success_doc = 0
+    less_doc = 0
     print(f'预计将发布{total_doc}篇文章')
     for i in sorted(result, key=lambda x: x[1], reverse=True):
         if i[0][-3:] == 'txt':
@@ -127,6 +128,9 @@ def main(url, user, password, path, Key):
         try:
             print(f'读取文件:{path1}')
             keyword, summary, L = read_file(path1, Key)
+            if len(L) < 3:
+                print(f'{path1}内容太少,跳过')
+                less_doc += 1
             wordpress.add_article(title, keyword, summary, L)
             wordpress.continue_add()
         except Exception as e:
@@ -138,7 +142,7 @@ def main(url, user, password, path, Key):
             success_doc += 1
             print(f'发布文章:{title} 成功,准备发布下一篇')
         finally:
-            print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
+            print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇,跳过{less_doc}篇')
     print('发布文章结束')
 
 

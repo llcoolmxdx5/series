@@ -8,8 +8,6 @@ from functools import partial
 
 import requests
 
-nowDate = '2019-03-15'
-
 def html_download(url):
     headers = {'User-Agent': "User-Agent:Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)"}
     # request = Request(url, headers=headers)
@@ -52,7 +50,7 @@ def dateRange(beginDate, endDate):
     return dates
 
 
-def start(now_date, page, file_title):
+def start(page, now_date, file_title):
     for res in parse_page(now_date, page):
         save_to_csv(res, file_title)
 

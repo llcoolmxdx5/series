@@ -6,7 +6,7 @@ from sinacontent import main as contentmain
 from sinasave import main as savemain
 
 now_date = '2019-03-15'
-total_page = 35
+total_page = 60
 result_path = f'D:\\新建文件夹\\{now_date}'
 
 path = sys.path[0]
