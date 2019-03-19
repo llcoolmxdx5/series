@@ -14,10 +14,11 @@ except Exception as e:
 DISPLAY_BROSER = True
 
 class WordPressAddArticle:
-    def __init__(self, url, user, password):
+    def __init__(self, url, user, password, Key):
         self.uname = user
         self.upwd = password
         self.url = url
+        self.key = Key
         if DISPLAY_BROSER:
             self.browser = webdriver.Chrome()
             self.browser.maximize_window()
@@ -27,7 +28,7 @@ class WordPressAddArticle:
             self.browser = webdriver.Chrome(chrome_options=chrome_options)
         self.browser.implicitly_wait(20)
 
-    def exit(self):
+    def __del__(self):
         self.browser.close()
 
     def __click(self, selector):
@@ -39,7 +40,7 @@ class WordPressAddArticle:
     def login(self):
         uname_selector = '#user_login'
         upwd_selector = '#user_pass'
-        submit_selctor = '#ord-resssubmit'
+        submit_selctor = '#wp-submit'
         self.browser.get(self.url)
         self.__sendkeys(uname_selector, self.uname)
         self.__sendkeys(upwd_selector, self.upwd)
@@ -59,16 +60,21 @@ class WordPressAddArticle:
         body_selector = '#content'
         summary_selector = '#aiosp_description_wrapper > div > span.aioseop_option_input > div.aioseop_option_div > textarea'
         column_selector = '#in-category-1598'
-        self.__sendkeys(title_selector, title)
-        self.__sendkeys(keyword_selector, keyword)
-        self.__sendkeys(summary_selector, summary)
-        self.__click(sourcecode_selector)
+        self.__sendkeys(title_selector, f'{self.key}_{title}_{self.key}')
+        try:
+            self.__click(sourcecode_selector)
+        except:
+            pass
         for line in L:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
+        self.__sendkeys(keyword_selector, f'{self.key},{keyword}')
+        self.__sendkeys(summary_selector, summary)
+        js = 'window.scrollTo(0,0)'
+        self.browser.execute_script(js)
         self.__click(column_selector)
         self.__click(save_selector)
-
+#publish
     def continue_add(self):
         continue_selector = '#wpbody-content > div.wrap > a'
         self.__click(continue_selector)
@@ -81,25 +87,27 @@ def autokeyword(path):
     return ','.join(keys)
 
 
-def read_file(path1):
+def read_file(path1,Key):
+    content_key = [f'{Key}规则',f'{Key}技巧',f'{Key}玩法',f'{Key}游戏',f'{Key}策略',f'{Key}必胜']
     with open(path1, 'r') as f:
         L = ['<style>.acc_acc font-size: 14px;</style>']
         content_L = []
+        index = 0
         for j in f.readlines():
             if len(j) < 4:
                 continue
-            content_L.append(j)
+            index += 1
+            content_L.append(j+content_key[index % 5])
         summary = content_L[0]
         for i in content_L:
             L.append(f'<span class="acc_acc">　　{i[:-1].strip()}</span><br class="acc_acc">')
-            L.append(f'<span class="acc_acc">　　</span><br class="acc_acc">')
     keys = autokeyword(path1)
     keyword = f'{keys}'
     return keyword, summary, L
 
 
-def main(url, user, password, path):
-    wordpress = WordPressAddArticle(url, user, password)
+def main(url, user, password, path, Key):
+    wordpress = WordPressAddArticle(url, user, password, Key)
     print('正在初始化')
     wordpress.login()
     print('登录成功')
@@ -118,7 +126,7 @@ def main(url, user, password, path):
             continue
         try:
             print(f'读取文件:{path1}')
-            keyword, summary, L = read_file(path1)
+            keyword, summary, L = read_file(path1, Key)
             wordpress.add_article(title, keyword, summary, L)
             wordpress.continue_add()
         except Exception as e:
@@ -132,6 +140,5 @@ def main(url, user, password, path):
         finally:
             print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
     print('发布文章结束')
-    wordpress.exit()
 
 

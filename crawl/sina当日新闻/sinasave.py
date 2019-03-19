@@ -5,14 +5,15 @@ import os
 def code_transfer(string):
     replaces = ['"', '：', ' ', ' ', ':', '/', '<', '>', '?', '“', '”', '|', '*']
     for i in replaces:
-        string = ''.join(string.split(i))
+        string = string.replace(i, '')
     return string
 
 
 def gbk_cannot(string):
-    replaces = ['\u30fb', '\ufffd', '\u3000', '\n','\u2022', '\u22c5','\u25ba','\u25b7','\uf9dd','\xf6','\xb3',
-                '\xba','\u2f0a','\xb4','\xc5','\u25aa','\u301c','\u2122','\uff89','\u2f08','\xae','\u2027','\xa0',
-                '责任编辑', '记者','新浪','中新网','澎湃新闻','中国网','新京报','央视网','原标题','来源：']
+    replaces = ['\u30fb', '\ufffd', '\u3000', '\n','\u2022', '\u22c5','\u25ba', '\u25b7', '\uf9dd', '\xf6', '\xb3',
+                '\xba', '\u2f0a', '\xb4', '\xc5', '\u25aa', '\u301c', '\u2122', '\uff89', '\u2f08', '\xae', '\u2027',
+                '\xa0', '\U0001f4d5', '\U0001f4c5', '记者', '新浪', '中新网', '澎湃新闻', '中国网', '新京报', '央视网', 
+                '来源：', '新华社']
     for i in replaces:
         string = string.replace(i, '')
     return string
@@ -41,17 +42,17 @@ def main(now_date, file_content, result_path):
                         num += 1
                         if len(p) < 5:
                             continue
-                        if p[:3] == '原标题':
+                        if '原标题' in p or '责任编辑' in p:
                             continue
                         if num < 2:
                             content.append(gbk_cannot(p[1:-1]))
                         else:
                             content.append(gbk_cannot(p[2:-1]))
-                    content = '\n\n'.join(content)
-                    if len(content) < 20:
+                    content_str = '\n\n'.join(content)
+                    if len(content) < 1:
                         continue
                     with open(path, 'w') as f1:
-                        f1.write(content)
+                        f1.write(content_str)
                 break
             except Exception as e:
                 print(e)
