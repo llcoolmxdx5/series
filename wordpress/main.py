@@ -29,6 +29,7 @@ class WordPressAddArticle:
         self.browser.implicitly_wait(20)
 
     def __del__(self):
+        self.error()
         self.browser.close()
 
     def __click(self, selector):
@@ -78,10 +79,16 @@ class WordPressAddArticle:
     def continue_add(self):
         continue_selector = '#wpbody-content > div.wrap > a'
         self.__click(continue_selector)
+    
+    def error(self):
+        try:
+            self.browser.switch_to_alert().accept()
+        except:
+            pass
 
 
 def autokeyword(path):
-    with open(path) as f:
+    with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
     keys = jieba.analyse.extract_tags(content, topK=3, allowPOS=('ns', 'n', 'vn', 'v', 'i', 'l', 'nr', 'nt', 'nz'))
     return ','.join(keys)
@@ -89,7 +96,7 @@ def autokeyword(path):
 
 def read_file(path1,Key):
     content_key = [f'{Key}规则',f'{Key}技巧',f'{Key}玩法',f'{Key}游戏',f'{Key}策略',f'{Key}必胜']
-    with open(path1, 'r') as f:
+    with open(path1, 'r', encoding='utf-8') as f:
         L = ['<style>.acc_acc font-size: 14px;</style>']
         content_L = []
         index = 0
@@ -117,7 +124,6 @@ def main(url, user, password, path, Key):
     total_doc = len(result)
     error_doc = 0
     success_doc = 0
-    less_doc = 0
     print(f'预计将发布{total_doc}篇文章')
     for i in sorted(result, key=lambda x: x[1], reverse=True):
         if i[0][-3:] == 'txt':
@@ -128,21 +134,19 @@ def main(url, user, password, path, Key):
         try:
             print(f'读取文件:{path1}')
             keyword, summary, L = read_file(path1, Key)
-            if len(L) < 3:
-                print(f'{path1}内容太少,跳过')
-                less_doc += 1
             wordpress.add_article(title, keyword, summary, L)
             wordpress.continue_add()
         except Exception as e:
             error_doc += 1
             print(f'发布文章:{title} 失败')
             print(e)
+            wordpress.error()
             wordpress.pre_add()
         else:
             success_doc += 1
             print(f'发布文章:{title} 成功,准备发布下一篇')
         finally:
-            print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇,跳过{less_doc}篇')
+            print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
     print('发布文章结束')
 
 

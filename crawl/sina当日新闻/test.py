@@ -1,4 +1,4 @@
 ''
-p = ":沙发`"
-if '原标题' in p or '责任编辑' in p:
-    print(1)
+import os
+path = 'D:\\sina\\2019-03-19'
+os.mkdir(path)

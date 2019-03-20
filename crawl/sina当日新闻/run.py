@@ -7,7 +7,7 @@ from sinasave import main as savemain
 
 now_date = '2019-03-15'
 total_page = 60
-result_path = f'D:\\新建文件夹\\{now_date}'
+result_path = f'D:\\sina\\{now_date}'
 
 path = sys.path[0]
 file_title = f'{path}\\新浪新闻{now_date}title.csv'
