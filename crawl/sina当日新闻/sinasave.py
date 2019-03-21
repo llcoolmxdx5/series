@@ -23,7 +23,6 @@ def main(now_date, file_content, result_path):
     ban_words = ['习近平','李克强','胡锦涛','温家宝','江泽民','韩正','栗战书','王岐山','汪洋','王沪宁','赵乐际','大麻',
                  '海洛因','罂粟','洗钱']
     alter_words = ['新闻中心','新浪军事','人民日报海外版','人民日报','新浪']
-    continue_switch = False
     with open(file_content, 'r', encoding='gb18030') as csvfile:
         reader = csv.reader(csvfile)
         while True:
@@ -31,15 +30,18 @@ def main(now_date, file_content, result_path):
                 for row in reader:
                     title = code_transfer(row[0])
                     if len(title) < 2:
-                        continue_switch = True
+                        continue
+                    continue_switch = False
                     for banword in ban_words:
                         if banword in title:
                             continue_switch = True
+                    if continue_switch:
+                        continue
                     for altword in alter_words:
                         title = title.replace(altword, '')
                     path = f'{result_path}\\{title}.txt'
                     if os.path.exists(path):
-                        continue_switch = True
+                        continue
                     content = []
                     l = row[1][1:-1].split(',')
                     num = 0
@@ -55,7 +57,7 @@ def main(now_date, file_content, result_path):
                             content.append(gbk_cannot(p[2:-1]))
                     content_str = '\n\n'.join(content)
                     if len(content) < 1:
-                        continue_switch = True
+                        continue
                     if continue_switch:
                         continue
                     with open(path, 'w', encoding='utf-8') as f1:

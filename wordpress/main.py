@@ -1,6 +1,7 @@
 import warnings
 import time
 import os
+import random
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -51,6 +52,8 @@ class WordPressAddArticle:
         article_selector = '#menu-posts > a > div.wp-menu-name'
         warticle_selector = '#wpbody-content > div.wrap > a'
         self.__click(article_selector)
+        self.error()
+        time.sleep(2)
         self.__click(warticle_selector)
 
     def add_article(self, title, keyword, summary, L):
@@ -69,17 +72,20 @@ class WordPressAddArticle:
         for line in L:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
+        time.sleep(2)
         self.__sendkeys(keyword_selector, f'{self.key},{keyword}')
         self.__sendkeys(summary_selector, summary)
         js = 'window.scrollTo(0,0)'
         self.browser.execute_script(js)
+        time.sleep(2)
         self.__click(column_selector)
         self.__click(save_selector)
+        time.sleep(2)
 #publish
     def continue_add(self):
         continue_selector = '#wpbody-content > div.wrap > a'
         self.__click(continue_selector)
-    
+
     def error(self):
         try:
             self.browser.switch_to_alert().accept()
@@ -103,13 +109,13 @@ def read_file(path1,Key):
         for j in f.readlines():
             if len(j) < 4:
                 continue
-            content_L.append(j+content_key[index % 6])
+            content_L.append(j[:-1].strip()+content_key[index % 6])
             index += 1
         summary = content_L[0]
         for i in content_L:
-            L.append(f'<span class="acc_acc">　　{i[:-1].strip()}</span><br class="acc_acc">')
+            L.append(f'<span class="acc_acc">　　{i.strip()}</span><br class="acc_acc">')
     keys = autokeyword(path1)
-    keyword = f'{keys}'
+    keyword = f'{Key},{keys}'
     return keyword, summary, L
 
 
@@ -140,13 +146,21 @@ def main(url, user, password, path, Key):
             error_doc += 1
             print(f'发布文章:{title} 失败')
             print(e)
-            wordpress.error()
             wordpress.pre_add()
         else:
             success_doc += 1
             print(f'发布文章:{title} 成功,准备发布下一篇')
         finally:
             print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
+            now_hour = time.strftime('%H',time.localtime(time.time()))
+            os.remove(path1)
+            if  now_hour > 19 or now_hour < 7:
+                time.sleep(random.randint(5, 15))
+            else:
+                time.sleep(random.randint(1, 5))
     print('发布文章结束')
 
 
+if __name__ == "__main__":
+    m = read_file(r'D:\新建文件夹\2019-03-15\现场实录国务院总理李克强回答中外记者提问.txt','21点')
+    print(m)
