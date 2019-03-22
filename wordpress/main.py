@@ -16,11 +16,10 @@ except Exception as e:
 DISPLAY_BROSER = True
 
 class WordPressAddArticle:
-    def __init__(self, url, user, password, Key):
+    def __init__(self, url, user, password):
         self.uname = user
         self.upwd = password
         self.url = url
-        self.key = Key
         if DISPLAY_BROSER:
             self.browser = webdriver.Chrome()
             self.browser.maximize_window()
@@ -57,7 +56,7 @@ class WordPressAddArticle:
         time.sleep(2)
         self.__click(warticle_selector)
 
-    def add_article(self, title, keyword, summary, L):
+    def add_article(self, title, keyword, summary, L, key):
         title_selector = '#title'
         keyword_selector = '#aiosp_keywords_wrapper > div > span.aioseop_option_input > div.aioseop_option_div > input[type="text"]'
         save_selector = '#publish'
@@ -65,7 +64,7 @@ class WordPressAddArticle:
         body_selector = '#content'
         summary_selector = '#aiosp_description_wrapper > div > span.aioseop_option_input > div.aioseop_option_div > textarea'
         column_selector = '#in-category-1598'
-        self.__sendkeys(title_selector, f'{self.key}_{title}_{self.key}')
+        self.__sendkeys(title_selector, f'{key}_{title}_{key}')
         try:
             self.__click(sourcecode_selector)
         except:
@@ -74,7 +73,7 @@ class WordPressAddArticle:
             self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
         time.sleep(2)
-        self.__sendkeys(keyword_selector, f'{self.key},{keyword}')
+        self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
         js = 'window.scrollTo(0,0)'
         self.browser.execute_script(js)
@@ -108,7 +107,7 @@ def read_file(path1):
             L.append(j[:-1])
     random.shuffle(L)
     s = L[0].split(',')
-    title = s[0]
+    title_key = s[0]
     content_key = s[1:]
     with open(path1, 'r', encoding='utf-8') as f:
         L = ['<style>.acc_acc font-size: 14px;</style>']
@@ -123,12 +122,12 @@ def read_file(path1):
         for i in content_L:
             L.append(f'<span class="acc_acc">　　{i.strip()}</span><br class="acc_acc">')
     keys = autokeyword(path1)
-    keyword = f'{title},{keys}'
-    return keyword, summary, L
+    keyword = f'{title_key},{keys}'
+    return keyword, summary, L, title_key
 
 
 def main(url, user, password, path):
-    wordpress = WordPressAddArticle(url, user, password, Key)
+    wordpress = WordPressAddArticle(url, user, password)
     print('正在初始化')
     wordpress.login()
     print('登录成功')
@@ -147,8 +146,8 @@ def main(url, user, password, path):
             continue
         try:
             print(f'读取文件:{path1}')
-            keyword, summary, L = read_file(path1)
-            wordpress.add_article(title, keyword, summary, L)
+            keyword, summary, L, Key = read_file(path1)
+            wordpress.add_article(title, keyword, summary, L, Key)
             wordpress.continue_add()
         except Exception as e:
             error_doc += 1
@@ -160,7 +159,7 @@ def main(url, user, password, path):
             print(f'发布文章:{title} 成功,准备发布下一篇')
         finally:
             print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
-            now_hour = time.strftime('%H',time.localtime(time.time()))
+            now_hour = int(time.strftime('%H',time.localtime(time.time())))
             os.remove(path1)
             if  now_hour > 19 or now_hour < 7:
                 time.sleep(random.randint(5, 15))

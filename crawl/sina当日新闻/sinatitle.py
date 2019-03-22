@@ -4,9 +4,12 @@ import multiprocessing
 import re
 import sys
 import threading
+from datetime import datetime, timedelta
 from functools import partial
+import time
 
 import requests
+
 
 def html_download(url):
     headers = {'User-Agent': "User-Agent:Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)"}
@@ -55,7 +58,18 @@ def start(page, now_date, file_title):
         save_to_csv(res, file_title)
 
 
-def main(now_date, total_page, file_title):
+def get_totalpage(date):
+    now_day = datetime.today().date() - timedelta(days=0)
+    pre_day = datetime.today().date() - timedelta(days=1)
+    stime = int(time.mktime(time.strptime(str(now_day), '%Y-%m-%d')))
+    etime = int(time.mktime(time.strptime(str(pre_day), '%Y-%m-%d')))
+    url = f'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid=2509&date={date}&k=&num=50&page=1&etime={etime}&stime={stime}&ctime={stime}'
+    html = html_download(url)
+    total_page = html['result']['total']
+    return int(total_page) // 50 + 1
+
+def main(now_date, file_title):
+    total_page = get_totalpage(now_date)
     #多线程
     pool = multiprocessing.Pool()
     # 多进程
@@ -65,5 +79,6 @@ def main(now_date, total_page, file_title):
     thread.join()
 
 if __name__ == '__main__':
-    now_date = ''
-    main(now_date,1, '')
+    # a = get_totalpage('2019-03-21')
+    # print(a)
+    print(datetime.today().date())
