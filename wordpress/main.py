@@ -2,6 +2,7 @@ import warnings
 import time
 import os
 import random
+import sys
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -30,8 +31,8 @@ class WordPressAddArticle:
         self.browser.implicitly_wait(20)
 
     def __del__(self):
-        self.error()
         self.browser.close()
+        self.error()
 
     def __click(self, selector):
         self.browser.find_element_by_css_selector(selector).click()
@@ -100,8 +101,15 @@ def autokeyword(path):
     return ','.join(keys)
 
 
-def read_file(path1,Key):
-    content_key = [f'{Key}规则',f'{Key}技巧',f'{Key}玩法',f'{Key}游戏',f'{Key}策略',f'{Key}必胜']
+def read_file(path1):
+    L = []
+    with open(sys.path[0]+r'\keyword.txt', 'r',encoding='utf-8') as f:
+        for j in f.readlines():
+            L.append(j[:-1])
+    random.shuffle(L)
+    s = L[0].split(',')
+    title = s[0]
+    content_key = s[1:]
     with open(path1, 'r', encoding='utf-8') as f:
         L = ['<style>.acc_acc font-size: 14px;</style>']
         content_L = []
@@ -109,17 +117,17 @@ def read_file(path1,Key):
         for j in f.readlines():
             if len(j) < 4:
                 continue
-            content_L.append(j[:-1].strip()+content_key[index % 6])
+            content_L.append(j[:-1].strip()+content_key[index % len(content_key)])
             index += 1
         summary = content_L[0]
         for i in content_L:
             L.append(f'<span class="acc_acc">　　{i.strip()}</span><br class="acc_acc">')
     keys = autokeyword(path1)
-    keyword = f'{Key},{keys}'
+    keyword = f'{title},{keys}'
     return keyword, summary, L
 
 
-def main(url, user, password, path, Key):
+def main(url, user, password, path):
     wordpress = WordPressAddArticle(url, user, password, Key)
     print('正在初始化')
     wordpress.login()
@@ -139,7 +147,7 @@ def main(url, user, password, path, Key):
             continue
         try:
             print(f'读取文件:{path1}')
-            keyword, summary, L = read_file(path1, Key)
+            keyword, summary, L = read_file(path1)
             wordpress.add_article(title, keyword, summary, L)
             wordpress.continue_add()
         except Exception as e:
@@ -162,5 +170,5 @@ def main(url, user, password, path, Key):
 
 
 if __name__ == "__main__":
-    m = read_file(r'D:\新建文件夹\2019-03-15\现场实录国务院总理李克强回答中外记者提问.txt','21点')
+    m = read_file(r'D:\新建文件夹\2019-03-15\现场实录国务院总理李克强回答中外记者提问.txt')
     print(m)
