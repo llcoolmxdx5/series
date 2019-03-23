@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from main import main
 
-date = datetime.today().day() - timedelta(days=1)
+date = str(datetime.today().date() - timedelta(days=1))
 
 if __name__ == "__main__":
     with open(sys.path[0]+r'\config.csv', 'r', encoding='utf-8') as csvfile:

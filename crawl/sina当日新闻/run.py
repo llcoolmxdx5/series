@@ -7,7 +7,7 @@ from sinacontent import main as contentmain
 from sinasave import main as savemain
 
 
-now_date = datetime.today().day() - timedelta(days=1)
+now_date = str(datetime.today().date() - timedelta(days=1))
 result_path = f'D:\\sina\\{now_date}'
 
 path = sys.path[0]

@@ -68,6 +68,7 @@ def get_totalpage(date):
     total_page = html['result']['total']
     return int(total_page) // 50 + 1
 
+
 def main(now_date, file_title):
     total_page = get_totalpage(now_date)
     #多线程
@@ -78,7 +79,7 @@ def main(now_date, file_title):
     thread.start()
     thread.join()
 
+
 if __name__ == '__main__':
-    # a = get_totalpage('2019-03-21')
-    # print(a)
-    print(datetime.today().date())
+    a = get_totalpage('2019-03-21')
+    print(a)
