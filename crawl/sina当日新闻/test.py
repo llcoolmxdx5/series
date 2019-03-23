@@ -1,9 +1,8 @@
 ''
-import os
-import time
+from pyquery import PyQuery as pq
 
-import time
-from datetime import datetime, timedelta
-
-now_date = datetime.today().date() - timedelta(days=1)
-print(now_date)
+def parse(html):
+    doc = pq(html)
+    aes = doc('a').items()
+    for a in aes:
+        print(a.href)

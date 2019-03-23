@@ -17,4 +17,8 @@ if __name__ == "__main__":
             user = row['用户名']
             password = row['密码']
             path = row['文件夹路径'] + '\\' + date
-            main(url, user, password, path)
+            try:
+                main(url, user, password, path)
+            except Exception as e:
+                print(e)
+                main(url, user, password, path)
