@@ -159,12 +159,13 @@ def main(url, user, password, path):
             print(f'发布文章:{title} 成功,准备发布下一篇')
         finally:
             print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
-            now_hour = int(time.strftime('%H',time.localtime(time.time())))
             os.remove(path1)
-            if  now_hour > 19 or now_hour < 7:
-                time.sleep(random.randint(5, 15))
-            else:
-                time.sleep(random.randint(1, 5))
+            if total_doc > 1500:
+                now_hour = int(time.strftime('%H',time.localtime(time.time())))
+                if  now_hour > 19 or now_hour < 7:
+                    time.sleep(random.randint(5, 15))
+                else:
+                    time.sleep(random.randint(1, 5))
     print('发布文章结束')
 
 
