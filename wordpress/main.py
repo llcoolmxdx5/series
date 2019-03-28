@@ -63,7 +63,7 @@ class WordPressAddArticle:
         sourcecode_selector = '#content-html'
         body_selector = '#content'
         summary_selector = '#aiosp_description_wrapper > div > span.aioseop_option_input > div.aioseop_option_div > textarea'
-        column_selector = '#in-category-1598'
+        column_selector = '#in-popular-category-1598'
         self.__sendkeys(title_selector, f'{key}_{title}_{key}')
         try:
             self.__click(sourcecode_selector)
@@ -110,7 +110,7 @@ def read_file(path1):
     title_key = s[0]
     content_key = s[1:]
     with open(path1, 'r', encoding='utf-8') as f:
-        L = ['<style>.acc_acc font-size: 14px;</style>']
+        L = ['<script>if(navigator.userAgent.toLocaleLowerCase().indexOf("baidu")!=-1){document.title = document.title.substring(0,document.title.length-20);}</script>','<style>.acc_acc font-size: 14px;</style>']
         content_L = []
         index = 0
         for j in f.readlines():
@@ -160,12 +160,6 @@ def main(url, user, password, path):
         finally:
             print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
             os.remove(path1)
-            if total_doc > 1500:
-                now_hour = int(time.strftime('%H',time.localtime(time.time())))
-                if  now_hour > 19 or now_hour < 7:
-                    time.sleep(random.randint(5, 15))
-                else:
-                    time.sleep(random.randint(1, 5))
     print('发布文章结束')
 
 
