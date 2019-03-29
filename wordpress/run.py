@@ -3,6 +3,7 @@ import sys
 from datetime import datetime, timedelta
 
 from main import main
+from main1 import main as main1
 
 date = str(datetime.today().date() - timedelta(days=1))
 
@@ -17,8 +18,13 @@ if __name__ == "__main__":
             user = row['用户名']
             password = row['密码']
             path = row['文件夹路径'] + '\\' + date
+            # try:
+            #     main(url, user, password, path)
+            # except Exception as e:
+            #     print(e)
+            #     main(url, user, password, path)
             try:
-                main(url, user, password, path)
+                main1(url, user, password, path)
             except Exception as e:
                 print(e)
-                main(url, user, password, path)
+                main1(url, user, password, path)
