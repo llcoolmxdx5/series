@@ -3,15 +3,26 @@ import os
 
 
 def code_transfer(string):
-    replaces = ['"', '：', ' ', ' ', ':', '/', '<', '>', '?', '“', '”', '|', '*']
+    replaces = ['\\','/','*','?','>','?',':','"','|','<']
     for i in replaces:
-        string = string.replace(i, '')
+        if i == '?':
+            string = string.replace(i, '？')
+        elif i == '<':
+            string = string.replace(i, '《')
+        elif i == '>':
+            string = string.replace(i, '》')
+        elif i == ':':
+            string = string.replace(i, '：')
+        elif i == '"':
+            string = string.replace(i, '“')
+        else:
+            string = string.replace(i, '')
     return string
 
 
 def gbk_cannot(string):
     replaces = ['\xa0', '记者', '新浪', '中新网', '澎湃新闻', '中国网', '新京报', '央视网', '海外网', '环球网', 
-                '来源：', '新华社', '长安街知事','观察者网','']
+                '来源：', '新华社', '长安街知事','观察者网']
     for i in replaces:
         string = string.replace(i, '')
     return string
