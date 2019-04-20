@@ -129,50 +129,54 @@ def read_file(path1):
     keyword = f'{title_key},{keys}'
     return keyword, summary, L, title_key
 
+def start(wordpress, url, user, password, path):
+    print('正在初始化')
+    wordpress.login()
+    print('登录成功')
+    wordpress.pre_add()
+    print('选择栏目成功')
+    result = [(i, os.stat(f'{path}\\{i}').st_mtime) for i in os.listdir(path)]
+    total_doc = len(result)
+    error_doc = 0
+    success_doc = 0
+    print(f'预计将发布{total_doc}篇文章')
+    for i in sorted(result, key=lambda x: x[1], reverse=True):
+        if i[0][-3:] == 'txt':
+            title = i[0][:-4]
+            path1 = f'{path}\\{i[0]}'
+        else:
+            continue        
+        try:
+            print(f'读取文件:{path1}')
+            keyword, summary, L, Key = read_file(path1)
+            wordpress.add_article(title, keyword, summary, L, Key)
+            wordpress.continue_add()
+        except Exception as e:
+            error_doc += 1
+            print(f'发布文章:{title} 失败')
+            print(e)
+            wordpress.pre_add()
+        else:
+            success_doc += 1
+            print(f'发布文章:{title} 成功,准备发布下一篇')
+        finally:
+            print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
+            os.remove(path1)
 
 def main(url, user, password, path):
-    try:
-        while True:
+    while True:
+        try:
             wordpress = WordPressAddArticle(url, user, password)
-            print('正在初始化')
-            wordpress.login()
-            print('登录成功')
-            wordpress.pre_add()
-            print('选择栏目成功')
-            result = [(i, os.stat(f'{path}\\{i}').st_mtime) for i in os.listdir(path)]
-            total_doc = len(result)
-            error_doc = 0
-            success_doc = 0
-            print(f'预计将发布{total_doc}篇文章')
-            for i in sorted(result, key=lambda x: x[1], reverse=True):
-                if i[0][-3:] == 'txt':
-                    title = i[0][:-4]
-                    path1 = f'{path}\\{i[0]}'
-                else:
-                    continue        
-                try:
-                    print(f'读取文件:{path1}')
-                    keyword, summary, L, Key = read_file(path1)
-                    wordpress.add_article(title, keyword, summary, L, Key)
-                    wordpress.continue_add()
-                except Exception as e:
-                    error_doc += 1
-                    print(f'发布文章:{title} 失败')
-                    print(e)
-                    wordpress.pre_add()
-                else:
-                    success_doc += 1
-                    print(f'发布文章:{title} 成功,准备发布下一篇')
-                finally:
-                    print(f'文章发布进度:{success_doc}/{total_doc},失败{error_doc}篇')
-                    os.remove(path1)
+            start(wordpress, url, user, password, path)
+        except:
+            time.sleep(30)
+            wordpress = WordPressAddArticle(url, user, password)
+            start(wordpress, url, user, password, path)
+        else:
+            print('发布文章结束')
             break
-    except:
-        pass
-    else:
-        print('发布文章结束')
-    finally:
-        wordpress.quit()
+        finally:
+            wordpress.quit()
 
 
 if __name__ == "__main__":
