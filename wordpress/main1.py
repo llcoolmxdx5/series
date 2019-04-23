@@ -3,6 +3,7 @@ import time
 import os
 import random
 import sys
+import csv
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -22,6 +23,7 @@ class WordPressAddArticle:
         self.url = url
         self.index = 0
         self.tags = [row.split(',')[0] for row in open(sys.path[0]+r'\tags.csv', 'r', encoding='gb18030')]
+        random.shuffle(self.tags)
         if DISPLAY_BROSER:
             self.browser = webdriver.Chrome()
             self.browser.maximize_window()
@@ -58,6 +60,19 @@ class WordPressAddArticle:
         time.sleep(2)
         self.__click(warticle_selector)
 
+    def get_link(self):
+        path = f'{sys.path[0]}\\urls'
+        urls_path = os.listdir(path)
+        random.shuffle(urls_path)
+        path1 = f'{path}\\{urls_path[0]}'
+        with open(path1, 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            L = []
+            for row in reader:
+                L.append(row[0])
+            random.shuffle(L)
+        return f'<a href="{L[0]}" rel="nofollow">{self.tags[0]}</a>'
+
     def add_article(self, title, keyword, summary, L, key):
         title_selector = '#title'
         keyword_selector = '#aiosp_keywords_wrapper > div > span.aioseop_option_input > div.aioseop_option_div > input[type="text"]'
@@ -72,12 +87,19 @@ class WordPressAddArticle:
             self.__click(sourcecode_selector)
         except:
             pass
+        num = len(L)
+        i = 0
         for line in L:
-            self.__sendkeys(body_selector, line)
+            if i == num // 2:
+                self.__sendkeys(body_selector, f'{self.get_link()}{line}')
+            else:
+                self.__sendkeys(body_selector, line)
             self.__sendkeys(body_selector, Keys.ENTER)
+            i += 1
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
-        self.__sendkeys(tag_selector, self.tags[self.index % len(self.tags)])
+        # self.__sendkeys(tag_selector, self.tags[self.index % len(self.tags)])
+        self.__sendkeys(tag_selector, self.tags[0])
         js = 'window.scrollTo(0,0)'
         self.browser.execute_script(js)
         time.sleep(2)
