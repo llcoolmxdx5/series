@@ -23,7 +23,6 @@ class WordPressAddArticle:
         self.url = url
         self.index = 0
         self.tags = [row.split(',')[0] for row in open(sys.path[0]+r'\tags.csv', 'r', encoding='gb18030')]
-        random.shuffle(self.tags)
         if DISPLAY_BROSER:
             self.browser = webdriver.Chrome()
             self.browser.maximize_window()
@@ -61,6 +60,7 @@ class WordPressAddArticle:
         self.__click(warticle_selector)
 
     def get_link(self):
+        random.shuffle(self.tags)
         path = f'{sys.path[0]}\\urls'
         urls_path = os.listdir(path)
         random.shuffle(urls_path)
@@ -71,7 +71,7 @@ class WordPressAddArticle:
             for row in reader:
                 L.append(row[0])
             random.shuffle(L)
-        return f'<a href="{L[0]}" rel="nofollow">{self.tags[0]}</a>'
+        return f'<a href="{L[0]}" rel="nofollow"  target="_blank">{self.tags[0]}</a>'
 
     def add_article(self, title, keyword, summary, L, key):
         title_selector = '#title'
@@ -99,6 +99,7 @@ class WordPressAddArticle:
         self.__sendkeys(keyword_selector, keyword)
         self.__sendkeys(summary_selector, summary)
         # self.__sendkeys(tag_selector, self.tags[self.index % len(self.tags)])
+        random.shuffle(self.tags)
         self.__sendkeys(tag_selector, self.tags[0])
         js = 'window.scrollTo(0,0)'
         self.browser.execute_script(js)
@@ -133,7 +134,8 @@ def read_file(path1):
     random.shuffle(L)
     title_key = L[0]
     with open(path1, 'r', encoding='utf-8') as f:
-        L = ['<script>document.title = document.title.substring(0,document.title.length-20);</script>',
+        # <script>document.title = document.title.substring(0,document.title.length-20);</script>
+        L = ['',
              '<style>.acc_acc font-size: 14px;</style>']
         content_L = []
         for j in f.readlines():
