@@ -23,8 +23,11 @@ if __name__ == "__main__":
             # except Exception as e:
             #     print(e)
             #     main(url, user, password, path)
-            try:
-                main1(url, user, password, path)
-            except Exception as e:
-                print(e)
-                main1(url, user, password, path)
+            while True:
+                try:
+                    main1(url, user, password, path)
+                except AssertionError as e:
+                    print(e)
+                    break
+                except:
+                    pass

@@ -163,6 +163,8 @@ def start(wordpress, url, user, password, path):
     total_doc = len(result)
     error_doc = 0
     success_doc = 0
+    if total_doc == 0:
+        raise AssertionError("文章发布结束!")
     print(f'预计将发布{total_doc}篇文章')
     for i in sorted(result, key=lambda x: x[1], reverse=True):
         if i[0][-3:] == 'txt':
