@@ -2,12 +2,11 @@ import csv
 import sys
 from datetime import datetime, timedelta
 
-from main import main
-from main1 import main as main1
+from main import main as maintestlink
 
 date = str(datetime.today().date() - timedelta(days=1))
 
-if __name__ == "__main__":
+def main():
     with open(sys.path[0]+r'\config.csv', 'r', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -18,16 +17,14 @@ if __name__ == "__main__":
             user = row['用户名']
             password = row['密码']
             path = row['文件夹路径'] + '\\' + date
-            # try:
-            #     main(url, user, password, path)
-            # except Exception as e:
-            #     print(e)
-            #     main(url, user, password, path)
             while True:
                 try:
-                    main1(url, user, password, path)
+                    maintestlink(url, user, password, path)
                 except AssertionError as e:
                     print(e)
                     break
                 except:
                     pass
+
+if __name__ == "__main__":
+    main()
